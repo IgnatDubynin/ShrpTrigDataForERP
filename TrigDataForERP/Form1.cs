@@ -14,6 +14,9 @@ using Accord.Math;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using System.Numerics;
+using MathWorks.MATLAB.NET.Arrays;
+using MathWorks.MATLAB.NET.Utility;
+using fillgaps_;
 
 namespace TrigDataForERP
 {
@@ -25,6 +28,8 @@ namespace TrigDataForERP
             public int index1;//индекс начала эпохи, соответствующий индексу в ЭЭГ данных
         }
         public List<double[]> EpochsList = new List<double[]>();//надо добавить сюда индекс данных, соответствующий началу интервала
+
+        public List<double[]> SinepErpEpochsList = new List<double[]>();
 
         public List<EpochStruct> TestList = new List<EpochStruct>();
 
@@ -45,6 +50,7 @@ namespace TrigDataForERP
         int SrcIndx = 0;
         int ViewBlockSize = 3000;//размер отображаемой области графиков по Х
         int CurPos = 0;//текущая позиция скролла
+        public fillgap FillgapTest;
 
         VerticalLineAnnotation VA;
         RectangleAnnotation RA;
@@ -53,6 +59,8 @@ namespace TrigDataForERP
         public Form1()
         {
             InitializeComponent();
+
+            FillgapTest = new fillgaps_.fillgap();
         }
         private void AddChartAnnotationByX(int x, string label, Color lblClr)
         {
@@ -272,6 +280,33 @@ namespace TrigDataForERP
             }
         }
 
+        private void SinepERPDataDraw(double[] epoch)
+        {
+            if (epoch != null)
+            {
+                Chart chrt = chart2;
+                //chrt.Series.Clear();
+                Series srs2 = new Series();
+                //srs2.Name = "SinepSrs";
+                setSeriesCfg(srs2, Color.Green);
+                chrt.Series.Add(srs2);
+
+                chrt.ChartAreas[0].AxisX.MajorGrid.LineDashStyle = ChartDashStyle.DashDot;
+                chrt.ChartAreas[0].AxisY.MajorGrid.LineDashStyle = ChartDashStyle.DashDot;
+                chrt.ChartAreas[0].AxisY.Minimum = -30;//Math.Round(ERPepochAvrg.Min() - 25);
+                chrt.ChartAreas[0].AxisY.Maximum = 30;//Math.Round(ERPepochAvrg.Max() + 25);
+                for (int i=0; i<chrt.Series.Count; i++)
+                    chrt.Series[i].IsVisibleInLegend = false;
+                //chrt.ChartAreas[0].AxisY.Interval = 2;
+
+                double[] epochDataScaled = new double[epoch.Length];
+                for (int k = 0; k < epochDataScaled.Length; k++)
+                    epochDataScaled[k] = (epoch[k] * gv.ERPAmplCoef);
+
+                srs2.Points.DataBindY(epochDataScaled);
+            }
+        }
+
         private void EEGDataDraw(double[] data = null)
         {
             if (data != null)
@@ -397,6 +432,8 @@ namespace TrigDataForERP
 
                     DrawResult(ResultEpoch);
 
+                    //SinepERPDataDraw(ResultEpoch);
+
                     //Вычисление разницы с заранее подготовленным шаблоном RP
                     TemplateSubEpochForLSM = new double[gv.LAST_EP - gv.FIRST_EP];
                     System.Buffer.BlockCopy(ResultEpoch, gv.FIRST_EP * sizeof(double), TemplateSubEpochForLSM, (0) * sizeof(double), TemplateSubEpochForLSM.Length * sizeof(double));
@@ -419,7 +456,6 @@ namespace TrigDataForERP
                     txtBxErpRMS.Text = rmsErp.ToString();
                     diffRmsErp = rmsErp - rmsGnd;
                     txtBxDiffRMS.Text = (diffRmsErp).ToString();
-
 
                     textBox1.Text = "0";
 
@@ -1015,10 +1051,10 @@ namespace TrigDataForERP
                 double[] epochFilcos = EpochDataFirFil(mas_cos, fc.FIRFiltersList[i]);
                 double[] epochFilsin = EpochDataFirFil(mas_sin, fc.FIRFiltersList[i]);
 
-/*                double[] epochFilcos = new double[mas_cos.Length];
-                double[] epochFilsin = new double[mas_sin.Length];
-                System.Buffer.BlockCopy(mas_cos, 0, epochFilcos, 0, mas_cos.Length * sizeof(double));
-                System.Buffer.BlockCopy(mas_sin, 0, epochFilsin, 0, mas_sin.Length * sizeof(double));*/
+                /*                double[] epochFilcos = new double[mas_cos.Length];
+                                double[] epochFilsin = new double[mas_sin.Length];
+                                System.Buffer.BlockCopy(mas_cos, 0, epochFilcos, 0, mas_cos.Length * sizeof(double));
+                                System.Buffer.BlockCopy(mas_sin, 0, epochFilsin, 0, mas_sin.Length * sizeof(double));*/
 
                 /*                    for (int k = 0; k < epochFilcos.Length; k++)
                                     {
@@ -1030,17 +1066,87 @@ namespace TrigDataForERP
                                     DrawResult(ResultEpoch);
                                     return;*/
 
-                fc.ini_Gram(gv.ORDER);
+                //fc.ini_Gram(gv.ORDER);
 
                 //3.интерполяция полиномом центрального участка с кандидатной реализацией ВП
                 //отдельно для косинусных последовательностей
-                double[] buf1 = new double[epochFilcos.Length];
-                fc.Gram(epochFilcos, buf1);//вход; результат
+                //double[] buf1 = new double[epochFilcos.Length];
+                //fc.Gram(epochFilcos, buf1);//вход; результат
+
+                double[] epochFilcos_ = epochFilcos.Clone() as double[];
+                for (int k = gv.FIRST_EP; k <= gv.LAST_EP; k++)
+                    epochFilcos_[k] = double.NaN;//делаем физический gap перед подачей массива на "умную интерполяцию"
+
+                //обрезаем массив на величину нулей с начала и в конце. Чтобы ф-ция интерполяции не учитывала нули
+                int trim = epochFilcos_.Length - ((1257 - 1116 + 1) + (142));
+                double[] trimCosArr = new double[trim];
+                int indx = 142;
+                for (int k = 0; k < trimCosArr.Length; k++)
+                {
+                    trimCosArr[k] = epochFilcos_[indx];
+                    indx++;
+                }
+
+                //вызов матлабовской функции "умной интерполяции" из библиотеки
+                var res = FillgapTest.fillgaps_((MWNumericArray)trimCosArr);
+
+                double[,] fillgapsRes = (double[,])res.ToArray();
+                //double[] buf1 = new double[fillgapsRes.Length];
+                double[] buf1 = fillgapsRes.Cast<double>().ToArray();//аналог squeeze
+
+
+                //Прикручиваем обратно как было нули в начале и в конце.
+                trim = epochFilcos.Length;
+                double[] tmpArr = new double[trim];
+ 
+                indx = 142;
+                for (int k = 0; k < buf1.Length; k++)
+                {
+                    tmpArr[indx] = buf1[k];
+                    indx++;
+                }
+                buf1 = tmpArr.Clone() as double[];
+
+
                 double[] epochFilGramCos = new double[buf1.Length];
                 System.Buffer.BlockCopy(buf1, 0, epochFilGramCos, (0) * sizeof(double), buf1.Length * sizeof(double));
+
                 //отдельно для синусных последовательностей
-                double[] buf2 = new double[epochFilsin.Length];
-                fc.Gram(epochFilsin, buf2);//вход; результат
+                //double[] buf2 = new double[epochFilsin.Length];
+                //fc.Gram(epochFilsin, buf2);//вход; результат
+
+                double[] epochFilsin_ = epochFilsin.Clone() as double[];
+                for (int k = gv.FIRST_EP; k <= gv.LAST_EP; k++)
+                    epochFilsin_[k] = double.NaN;//делаем физический gap перед подачей массива на "умную интерполяцию"
+
+                //обрезаем массив на величину нулей с начала и в конце. Чтобы ф-ция интерполяции не учитывала нули
+                trim = epochFilsin_.Length - ((1257 - 1116 + 1) + (142));
+                double[] trimSinArr = new double[trim];
+                indx = 142;
+                for (int k = 0; k < trimSinArr.Length; k++)
+                {
+                    trimSinArr[k] = epochFilsin_[indx];
+                    indx++;
+                }
+
+                //вызов матлабовской функции "умной интерполяции" из библиотеки
+                var res2 = FillgapTest.fillgaps_((MWNumericArray)trimSinArr);
+
+                double[,] fillgapsRes2 = (double[,])res2.ToArray();
+                //double[] buf2 = new double[fillgapsRes2.Length];
+                double[] buf2 = fillgapsRes2.Cast<double>().ToArray();//аналог squeeze
+
+                //Прикручиваем обратно как было нули в начале и в конце.
+                trim = epochFilsin.Length;
+                double[] tmpArr2 = new double[trim];
+                indx = 142;
+                for (int k = 0; k < buf2.Length; k++)
+                {
+                    tmpArr2[indx] = buf2[k];
+                    indx++;
+                }
+                buf2 = tmpArr2.Clone() as double[];
+
                 double[] epochFilGramSin = new double[buf2.Length];
                 System.Buffer.BlockCopy(buf2, 0, epochFilGramSin, (0) * sizeof(double), buf2.Length * sizeof(double));
 
@@ -1294,6 +1400,77 @@ namespace TrigDataForERP
 
             hScrollBar1.Value = eps2.index1;
             hScrollBar1_Scroll(hScrollBar1, null);
+        }
+
+        private void btnGetFilteredData_Click(object sender, EventArgs e)
+        {
+            if (EpochDataFilArr != null)
+            {
+                var epoch = EpochDataFilArr;//EpochsList[dataGridView1.CurrentRow.Index];
+
+                rTxtBxIn.Clear();
+                for (int i = 0; i < epoch.Length; i++)
+                {
+                    rTxtBxIn.AppendText(epoch[i].ToString() + Environment.NewLine);
+                }
+                string[] resultStr = rTxtBxIn.Lines.Where((x, y) => y != rTxtBxIn.Lines.Length - 1).ToArray();//удалить последнюю пустую строку 
+                rTxtBxIn.Lines = resultStr;
+            }
+        }
+
+        private void button9_Click(object sender, EventArgs e)
+        {
+            if (EpochDataFilArr != null)
+            {
+                int trim = EpochDataFilArr.Length - ((1257 - 1116+1) + (142));
+                double[] tmpArr = new double[trim];
+
+                //обрезаем массив на величину нулей с начала и в конце. Чтобы ф-ция интерполяции не учитывала нули
+                int indx = 142;
+                for (int i= 0; i< tmpArr.Length; i++)
+                {
+                    tmpArr[i] = EpochDataFilArr[indx];
+                    indx++;
+                }                  
+
+                //вызов нашей функции из библиотеки
+                var res = FillgapTest.fillgaps_((MWNumericArray)tmpArr);
+
+                double[,] fillgapsRes = (double[,])res.ToArray();
+                double[] fillgapsRes_ = fillgapsRes.Cast<double>().ToArray();//аналог squeeze
+
+                trim = EpochDataFilArr.Length;
+                tmpArr = new double[trim];
+
+                //Прикручиваем обратно как было нули в начале и в конце. 
+                indx = 142;
+                for (int i = 0; i < fillgapsRes_.Length; i++)
+                {
+                    tmpArr[indx] = fillgapsRes_[i];
+                    indx++;
+                }
+                double[] resArr = tmpArr.Clone() as double[];
+            }
+        }
+
+        private void btnGetAvrgSinepERP_Click(object sender, EventArgs e)
+        {
+
+            for (int i=0; i< EpochsList.Count; i++)
+            {
+                double[] epoch = EpochsList[i];
+                ResultEpoch = new double[epoch.Length];
+
+                ResultEpoch = ExtractERP(epoch);
+
+                SinepErpEpochsList.Add(ResultEpoch.Clone() as double[]);
+            }
+
+            double[] sinepERPepochAvrg = Enumerable.Range(0, SinepErpEpochsList[0].Length)
+                            .Select(index => EpochsList.Average(item => item[index]))
+                            .ToArray();
+
+            SinepERPDataDraw(sinepERPepochAvrg);
         }
     }
 }

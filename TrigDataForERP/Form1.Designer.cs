@@ -102,6 +102,9 @@ namespace TrigDataForERP
             this.txtBxArtefactCntr = new System.Windows.Forms.TextBox();
             this.label10 = new System.Windows.Forms.Label();
             this.button8 = new System.Windows.Forms.Button();
+            this.btnGetFilteredData = new System.Windows.Forms.Button();
+            this.button9 = new System.Windows.Forms.Button();
+            this.btnGetAvrgSinepERP = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.chrtNativeData)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chart2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
@@ -212,11 +215,11 @@ namespace TrigDataForERP
             // 
             // btnGetData
             // 
-            this.btnGetData.Location = new System.Drawing.Point(15, 597);
+            this.btnGetData.Location = new System.Drawing.Point(24, 597);
             this.btnGetData.Name = "btnGetData";
-            this.btnGetData.Size = new System.Drawing.Size(92, 23);
+            this.btnGetData.Size = new System.Drawing.Size(86, 23);
             this.btnGetData.TabIndex = 11;
-            this.btnGetData.Text = "Get Epoch Data";
+            this.btnGetData.Text = "GetEpochData";
             this.btnGetData.UseVisualStyleBackColor = true;
             this.btnGetData.Click += new System.EventHandler(this.btnGetData_Click);
             // 
@@ -342,7 +345,7 @@ namespace TrigDataForERP
             // 
             // btnGetFilCoefs
             // 
-            this.btnGetFilCoefs.Location = new System.Drawing.Point(133, 597);
+            this.btnGetFilCoefs.Location = new System.Drawing.Point(143, 597);
             this.btnGetFilCoefs.Name = "btnGetFilCoefs";
             this.btnGetFilCoefs.Size = new System.Drawing.Size(75, 23);
             this.btnGetFilCoefs.TabIndex = 24;
@@ -437,7 +440,7 @@ namespace TrigDataForERP
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(21, 652);
+            this.label3.Location = new System.Drawing.Point(21, 712);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(49, 13);
             this.label3.TabIndex = 36;
@@ -446,7 +449,7 @@ namespace TrigDataForERP
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(21, 628);
+            this.label4.Location = new System.Drawing.Point(21, 688);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(48, 13);
             this.label4.TabIndex = 35;
@@ -454,7 +457,7 @@ namespace TrigDataForERP
             // 
             // UpDwnLastERP
             // 
-            this.UpDwnLastERP.Location = new System.Drawing.Point(95, 650);
+            this.UpDwnLastERP.Location = new System.Drawing.Point(95, 710);
             this.UpDwnLastERP.Maximum = new decimal(new int[] {
             1000,
             0,
@@ -472,7 +475,7 @@ namespace TrigDataForERP
             // 
             // UpDwnFirstERP
             // 
-            this.UpDwnFirstERP.Location = new System.Drawing.Point(95, 626);
+            this.UpDwnFirstERP.Location = new System.Drawing.Point(95, 686);
             this.UpDwnFirstERP.Maximum = new decimal(new int[] {
             1000,
             0,
@@ -543,6 +546,7 @@ namespace TrigDataForERP
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.button9);
             this.tabPage2.Controls.Add(this.button1);
             this.tabPage2.Controls.Add(this.btnERPFIRFil);
             this.tabPage2.Controls.Add(this.chckBxFIR);
@@ -647,7 +651,7 @@ namespace TrigDataForERP
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(675, 790);
+            this.label5.Location = new System.Drawing.Point(783, 790);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(55, 13);
             this.label5.TabIndex = 40;
@@ -655,7 +659,7 @@ namespace TrigDataForERP
             // 
             // txtBxGndRMS
             // 
-            this.txtBxGndRMS.Location = new System.Drawing.Point(678, 806);
+            this.txtBxGndRMS.Location = new System.Drawing.Point(786, 806);
             this.txtBxGndRMS.Name = "txtBxGndRMS";
             this.txtBxGndRMS.Size = new System.Drawing.Size(55, 20);
             this.txtBxGndRMS.TabIndex = 39;
@@ -663,7 +667,7 @@ namespace TrigDataForERP
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(745, 790);
+            this.label6.Location = new System.Drawing.Point(853, 790);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(52, 13);
             this.label6.TabIndex = 42;
@@ -671,7 +675,7 @@ namespace TrigDataForERP
             // 
             // txtBxErpRMS
             // 
-            this.txtBxErpRMS.Location = new System.Drawing.Point(748, 806);
+            this.txtBxErpRMS.Location = new System.Drawing.Point(856, 806);
             this.txtBxErpRMS.Name = "txtBxErpRMS";
             this.txtBxErpRMS.Size = new System.Drawing.Size(55, 20);
             this.txtBxErpRMS.TabIndex = 41;
@@ -679,7 +683,7 @@ namespace TrigDataForERP
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(815, 790);
+            this.label7.Location = new System.Drawing.Point(923, 790);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(51, 13);
             this.label7.TabIndex = 44;
@@ -687,7 +691,7 @@ namespace TrigDataForERP
             // 
             // txtBxDiffRMS
             // 
-            this.txtBxDiffRMS.Location = new System.Drawing.Point(818, 806);
+            this.txtBxDiffRMS.Location = new System.Drawing.Point(926, 806);
             this.txtBxDiffRMS.Name = "txtBxDiffRMS";
             this.txtBxDiffRMS.Size = new System.Drawing.Size(55, 20);
             this.txtBxDiffRMS.TabIndex = 43;
@@ -695,7 +699,7 @@ namespace TrigDataForERP
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(912, 790);
+            this.label8.Location = new System.Drawing.Point(1020, 790);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(49, 13);
             this.label8.TabIndex = 46;
@@ -703,14 +707,14 @@ namespace TrigDataForERP
             // 
             // txtBxLSMVal
             // 
-            this.txtBxLSMVal.Location = new System.Drawing.Point(915, 806);
+            this.txtBxLSMVal.Location = new System.Drawing.Point(1023, 806);
             this.txtBxLSMVal.Name = "txtBxLSMVal";
             this.txtBxLSMVal.Size = new System.Drawing.Size(55, 20);
             this.txtBxLSMVal.TabIndex = 45;
             // 
             // btnGetDataDiffRMS
             // 
-            this.btnGetDataDiffRMS.Location = new System.Drawing.Point(12, 687);
+            this.btnGetDataDiffRMS.Location = new System.Drawing.Point(12, 747);
             this.btnGetDataDiffRMS.Name = "btnGetDataDiffRMS";
             this.btnGetDataDiffRMS.Size = new System.Drawing.Size(101, 23);
             this.btnGetDataDiffRMS.TabIndex = 47;
@@ -720,7 +724,7 @@ namespace TrigDataForERP
             // 
             // btnGetTmpltForLSM
             // 
-            this.btnGetTmpltForLSM.Location = new System.Drawing.Point(119, 687);
+            this.btnGetTmpltForLSM.Location = new System.Drawing.Point(119, 747);
             this.btnGetTmpltForLSM.Name = "btnGetTmpltForLSM";
             this.btnGetTmpltForLSM.Size = new System.Drawing.Size(110, 23);
             this.btnGetTmpltForLSM.TabIndex = 48;
@@ -738,7 +742,7 @@ namespace TrigDataForERP
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(994, 790);
+            this.label9.Location = new System.Drawing.Point(1102, 790);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(68, 13);
             this.label9.TabIndex = 51;
@@ -746,7 +750,7 @@ namespace TrigDataForERP
             // 
             // txtBxArtefactCntr
             // 
-            this.txtBxArtefactCntr.Location = new System.Drawing.Point(997, 806);
+            this.txtBxArtefactCntr.Location = new System.Drawing.Point(1105, 806);
             this.txtBxArtefactCntr.Name = "txtBxArtefactCntr";
             this.txtBxArtefactCntr.Size = new System.Drawing.Size(55, 20);
             this.txtBxArtefactCntr.TabIndex = 50;
@@ -762,7 +766,7 @@ namespace TrigDataForERP
             // 
             // button8
             // 
-            this.button8.Location = new System.Drawing.Point(52, 779);
+            this.button8.Location = new System.Drawing.Point(60, 803);
             this.button8.Name = "button8";
             this.button8.Size = new System.Drawing.Size(75, 23);
             this.button8.TabIndex = 53;
@@ -770,11 +774,43 @@ namespace TrigDataForERP
             this.button8.UseVisualStyleBackColor = true;
             this.button8.Click += new System.EventHandler(this.button8_Click);
             // 
+            // btnGetFilteredData
+            // 
+            this.btnGetFilteredData.Location = new System.Drawing.Point(24, 626);
+            this.btnGetFilteredData.Name = "btnGetFilteredData";
+            this.btnGetFilteredData.Size = new System.Drawing.Size(86, 23);
+            this.btnGetFilteredData.TabIndex = 54;
+            this.btnGetFilteredData.Text = "GetEpochFilData";
+            this.btnGetFilteredData.UseVisualStyleBackColor = true;
+            this.btnGetFilteredData.Click += new System.EventHandler(this.btnGetFilteredData_Click);
+            // 
+            // button9
+            // 
+            this.button9.Location = new System.Drawing.Point(935, 410);
+            this.button9.Name = "button9";
+            this.button9.Size = new System.Drawing.Size(75, 23);
+            this.button9.TabIndex = 55;
+            this.button9.Text = "button9";
+            this.button9.UseVisualStyleBackColor = true;
+            this.button9.Click += new System.EventHandler(this.button9_Click);
+            // 
+            // btnGetAvrgSinepERP
+            // 
+            this.btnGetAvrgSinepERP.Location = new System.Drawing.Point(654, 803);
+            this.btnGetAvrgSinepERP.Name = "btnGetAvrgSinepERP";
+            this.btnGetAvrgSinepERP.Size = new System.Drawing.Size(75, 23);
+            this.btnGetAvrgSinepERP.TabIndex = 55;
+            this.btnGetAvrgSinepERP.Text = "GetAvrgSinepERP";
+            this.btnGetAvrgSinepERP.UseVisualStyleBackColor = true;
+            this.btnGetAvrgSinepERP.Click += new System.EventHandler(this.btnGetAvrgSinepERP_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1576, 838);
+            this.Controls.Add(this.btnGetAvrgSinepERP);
+            this.Controls.Add(this.btnGetFilteredData);
             this.Controls.Add(this.button8);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.label9);
@@ -890,6 +926,9 @@ namespace TrigDataForERP
         private System.Windows.Forms.TextBox txtBxArtefactCntr;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Button button8;
+        private System.Windows.Forms.Button btnGetFilteredData;
+        private System.Windows.Forms.Button button9;
+        private System.Windows.Forms.Button btnGetAvrgSinepERP;
     }
 }
 
